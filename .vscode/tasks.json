@@ -1,0 +1,117 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "0. 启动 Nacos",
+      "type": "shell",
+      "command": "E:\\Nacos\\nacos\\bin\\startup.cmd",
+      "args": ["-m", "standalone"],
+      "options": {
+        "env": {
+          "JAVA_HOME": "E:\\JDK17\\jdk-17.0.20.1+1"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "1. 启动 MySQL",
+      "type": "shell",
+      "command": "E:\\MySQL\\mysql-8.0.39-winx64\\bin\\mysqld.exe",
+      "args": [
+        "--basedir=E:\\MySQL\\mysql-8.0.39-winx64",
+        "--datadir=E:\\MySQL\\data",
+        "--console"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "2. 启动用户服务",
+      "type": "shell",
+      "command": "E:\\Maven\\apache-maven-3.9.9\\bin\\mvn.cmd",
+      "args": [
+        "spring-boot:run",
+        "-pl",
+        "services/user-service"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "JAVA_HOME": "E:\\JDK17\\jdk-17.0.20.1+1",
+          "PATH": "E:\\JDK17\\jdk-17.0.20.1+1\\bin;E:\\Maven\\apache-maven-3.9.9\\bin;${env:PATH}"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "3. 启动订单服务",
+      "type": "shell",
+      "command": "E:\\Maven\\apache-maven-3.9.9\\bin\\mvn.cmd",
+      "args": [
+        "spring-boot:run",
+        "-pl",
+        "services/order-service"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "JAVA_HOME": "E:\\JDK17\\jdk-17.0.20.1+1",
+          "PATH": "E:\\JDK17\\jdk-17.0.20.1+1\\bin;E:\\Maven\\apache-maven-3.9.9\\bin;${env:PATH}"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "4. 启动前端",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "dev"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "启动全部",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "2. 启动用户服务",
+        "3. 启动订单服务",
+        "4. 启动前端"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "java.jdt.ls.java.home": "E:\\JDK17\\jdk-17.0.20.1+1",
+  "maven.executable.path": "E:\\Maven\\apache-maven-3.9.9\\bin\\mvn.cmd",
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
+}

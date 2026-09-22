@@ -1,0 +1,22 @@
+# 构建与依赖产物
+target/
+node_modules/
+dist/
+
+# 运行期产物
+logs/
+work/
+derby.log
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+
+# 系统文件
+.DS_Store
+Thumbs.db
