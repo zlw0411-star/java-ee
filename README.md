@@ -2,6 +2,23 @@
 
 系统“选题六”实现，**技术栈为中等档（Nacos 微服务版）**。
 
+## 界面预览
+
+| <img src="screenshots/%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2.PNG" width="420"><br><sub>顾客登录</sub> | <img src="screenshots/%E7%94%A8%E6%88%B7%E7%82%B9%E5%8D%95%E7%95%8C%E9%9D%A2.PNG" width="420"><br><sub>顾客自助点餐</sub> |
+|---|---|
+| <img src="screenshots/%E6%9C%8D%E5%8A%A1%E5%91%98%E7%99%BB%E5%BD%95%E7%95%8C%E9%9D%A2.PNG" width="420"><br><sub>服务员登录</sub> | <img src="screenshots/%E6%9C%8D%E5%8A%A1%E5%91%98%E9%80%89%E6%A1%8C%E4%BB%A3%E7%82%B9.PNG" width="420"><br><sub>服务员选桌代客点单</sub> |
+|---|---|
+| <img src="screenshots/%E5%8A%A0%E8%8F%9C.PNG" width="420"><br><sub>加菜</sub> | <img src="screenshots/%E8%AE%A2%E5%8D%95%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%961.PNG" width="420"><br><sub>订单状态：已点好</sub> |
+|---|---|
+| <img src="screenshots/%E8%AE%A2%E5%8D%95%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%962.PNG" width="420"><br><sub>订单状态：结账中</sub> | <img src="screenshots/%E8%AE%A2%E5%8D%95%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%963.PNG" width="420"><br><sub>订单状态：已结账</sub> |
+|---|---|
+| <img src="screenshots/%E8%AE%A2%E5%8D%95%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%964.PNG" width="420"><br><sub>订单状态：已释放</sub> | <img src="screenshots/%E8%8F%9C%E5%93%81%E7%AE%A1%E7%90%86.PNG" width="420"><br><sub>菜品管理</sub> |
+|---|---|
+| <img src="screenshots/%E9%A4%90%E6%A1%8C%E7%AE%A1%E7%90%86.PNG" width="420"><br><sub>餐桌管理</sub> | <img src="screenshots/%E4%BC%9A%E5%91%98%E7%AE%A1%E7%90%86.PNG" width="420"><br><sub>会员管理</sub> |
+|---|---|
+| <img src="screenshots/%E8%90%A5%E6%94%B6%E6%9F%A5%E8%AF%A2.PNG" width="420"><br><sub>营收查询</sub> | <img src="screenshots/nacos.PNG" width="420"><br><sub>Nacos 服务注册</sub> |
+|---|---|
+
 ## 技术栈
 
 - 后端：Spring Boot 3.2.5 + Spring Cloud Alibaba（Nacos 服务注册/配置）+ OpenFeign（服务间调用）+ JPA
