@@ -45,9 +45,13 @@ public class OrderController {
         if (!identity[0].equals(String.valueOf(request.creatorId()))) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","创建人身份不匹配"));
         if (request.mode()==OrderMode.WAITER && !(identity[2].equals("WAITER") || identity[2].equals("ADMIN"))) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","只有服务员或管理员可以代客点餐"));
         if (request.mode()==OrderMode.CUSTOMER && !identity[2].equals("CUSTOMER")) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","只有顾客可以自助点餐"));
+        if (request.mode()==OrderMode.CUSTOMER) {
+            if (request.customerId() == null) return ResponseEntity.badRequest().body(Map.of("message","顾客点餐必须提供顾客编号"));
+            if (!identity[0].equals(String.valueOf(request.customerId()))) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","顾客编号与登录身份不匹配"));
+        }
         DiningTable table = tables.lockById(request.tableId()).orElse(null);
         if(table==null) return ResponseEntity.notFound().build();
-        if(request.mode()==OrderMode.CUSTOMER && (request.customerId()==null || request.tableCode()==null || !request.tableCode().equals(table.getTableCode())))
+        if(request.mode()==OrderMode.CUSTOMER && (request.tableCode()==null || !request.tableCode().equals(table.getTableCode())))
             return ResponseEntity.badRequest().body(Map.of("message","顾客点餐必须提供正确桌台码和顾客编号"));
         Optional<RestaurantOrder> active = orders.findFirstByTableIdAndStatusIn(table.getId(), List.of(OrderStatus.DRAFT, OrderStatus.SUBMITTED));
         if(active.isPresent()){
@@ -101,6 +105,7 @@ public class OrderController {
     public ResponseEntity<?> submit(@RequestHeader(value="Authorization", required=false) String authorization,@PathVariable("id") Long id){
         RestaurantOrder order=orders.findById(id).orElse(null); if(order==null)return ResponseEntity.notFound().build();
         if(!canEdit(order,identity(authorization))) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","无权提交此订单"));
+        if(order.getStatus()!=OrderStatus.DRAFT) return ResponseEntity.badRequest().body(Map.of("message","仅未提交订单可提交"));
         if(order.getItems().isEmpty()) return ResponseEntity.badRequest().body(Map.of("message","请至少选择一个菜品"));
         order.setStatus(OrderStatus.SUBMITTED); return ResponseEntity.ok(orders.save(order));
     }
@@ -109,13 +114,14 @@ public class OrderController {
     public ResponseEntity<?> settle(@RequestHeader(value="Authorization", required=false) String authorization, @PathVariable("id") Long id){
         RestaurantOrder order=orders.findById(id).orElse(null); if(order==null)return ResponseEntity.notFound().build();
         String[] identity=identity(authorization); if(!canClose(order, identity)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","无权结算此订单"));
-        if(order.getStatus()==OrderStatus.DRAFT) return ResponseEntity.badRequest().body(Map.of("message","订单尚未提交，请先提交再结账"));
+        if(order.getStatus()!=OrderStatus.SUBMITTED) return ResponseEntity.badRequest().body(Map.of("message","仅已提交订单可结算"));
         order.setStatus(OrderStatus.SETTLED); order.getTable().setStatus(TableStatus.AVAILABLE); order.setSettledAt(LocalDateTime.now()); orders.save(order); tables.save(order.getTable()); return ResponseEntity.ok(order);
     }
     @PostMapping("/orders/{id}/cancel") @Transactional
     public ResponseEntity<?> cancel(@RequestHeader(value="Authorization", required=false) String authorization, @PathVariable("id") Long id){
         RestaurantOrder order=orders.findById(id).orElse(null); if(order==null)return ResponseEntity.notFound().build();
         String[] identity=identity(authorization); if(!canClose(order, identity)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message","无权取消此订单"));
+        if(order.getStatus()!=OrderStatus.DRAFT && order.getStatus()!=OrderStatus.SUBMITTED) return ResponseEntity.badRequest().body(Map.of("message","仅未结束订单可取消"));
         order.setStatus(OrderStatus.CANCELLED); order.getTable().setStatus(TableStatus.AVAILABLE); orders.save(order); tables.save(order.getTable()); return ResponseEntity.ok(order);
     }
     @GetMapping("/orders/{id}") public ResponseEntity<?> get(@RequestHeader(value="Authorization", required=false) String authorization, @PathVariable("id") Long id){
