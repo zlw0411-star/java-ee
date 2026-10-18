@@ -52,29 +52,29 @@
 
 **重要发现**：仅做 `git push --force` **不足以**删除数据。强制推送后，旧 commit 对象仍可通过 GitHub API 匿名读取，docx 内容仍可下载。第一次验证时确实拿到了 `HTTP 200` 和文件内容。
 
-## 4. 当前状态与剩余风险
+## 4. 最终处理：删除仓库并重建（已完成）
 
-**仓库已设为 private**，外部无法访问。这解决了「公开可见」的问题，但**没有**解决「GitHub 服务器上仍有旧对象」的问题：只要仓库重新变为 public，旧 commit 仍可通过 SHA 下载。
+`git push --force` 只能让旧 commit 从默认分支上消失，**不能删除对象**。实测强制推送后，旧 SHA 仍可通过 API 匿名读取，docx 仍可下载。
 
-要彻底移除，需在以下两种方式中选一种：
+因此采取的方式是删除仓库后重建：
 
-1. **删除仓库后重建**（推荐，用于 0 star / 0 fork 的课程仓库）——立即、彻底，代价是链接失效
-2. **向 GitHub Support 提工单**，提供仓库名、受影响 PR 数、`git-filter-repo` 输出的 First Changed Commit——GitHub 才会做服务器端 GC 并清除缓存视图
+1. `gh auth refresh -h github.com -s delete_repo` 取得删除权限
+2. `gh repo delete zlw0411-star/java-ee --yes`
+3. `gh repo create zlw0411-star/java-ee --public --source=. --remote=origin --push`
 
-判断依据：该仓库 0 star、0 fork、0 PR，删除重建的外部影响接近于零。
+### 验证证据
 
-`gh` CLI 的当前令牌仅有 `repo` scope，删除仓库需要 `delete_repo`，需在本机完成一次设备授权：
+| 检查 | 结果 |
+| --- | --- |
+| 旧 commit `1155fcf`（匿名） | `422 No commit found for SHA` |
+| 旧 commit `7249236`（匿名） | `422 No commit found for SHA` |
+| 旧 commit `1e23eb6`（中间态，含敏感记录文件） | `422 No commit found for SHA` |
+| 旧 docx 路径直取 | `404` |
+| 新 HEAD `965243e`（匿名） | `200`，对照正常 |
+| GitHub Code Search：学号 / 姓名 / 旧密钥 | `0` / `0` / `0` |
+| 匿名列仓库根目录 | 仅 10 项，无 docx |
 
-```powershell
-gh auth refresh -h github.com -s delete_repo
-gh repo delete zlw0411-star/java-ee --yes
-```
-
-删除后重新创建并推送（本地仓库已是干净的 9 次提交）：
-
-```powershell
-gh repo create zlw0411-star/java-ee --public --source=. --remote=origin --push
-```
+结论：旧对象在 GitHub 服务器上已不可达。比提工单更快、更彻底，代价是旧链接失效（该仓库 0 star / 0 fork，无外部引用）。
 
 ## 5. 与代码无关但更紧急的一条
 
@@ -89,5 +89,10 @@ gh repo create zlw0411-star/java-ee --public --source=. --remote=origin --push
 
 ## 7. 待办
 
-- [ ] 决定删除重建还是提工单（见第 4 节）；完成后将仓库改回 public
+- [x] 删除重建完成，仓库已恢复 public
 - [ ] `personal-website` 中两处「上海电力大学」表述需核对真实性（`lib/portfolio-data.ts` 第 38、220 行附近）——属事实性内容，未经确认不应擅自修改
+- [ ] 若仓库日后重新公开且需保留敏感历史，改用 `git filter-repo --sensitive-data-removal` + Support 工单，而非 force push
+
+## 8. 本次的一个教训
+
+清理记录文件本身也是泄露面。第一版 `SECURITY-CLEANUP.md` 把姓名和学号原样写进了文档，等于换个地方重新公开。已改为占位描述，只保留可核对的 SHA-256。结论：**记录清理过程时不要复现待清除的值。**
