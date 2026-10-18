@@ -1,0 +1,111 @@
+{
+  // 本文件不保存本机绝对路径。运行前请在本机环境变量中配置：
+  //   JAVA_HOME   JDK 17 根目录
+  //   MAVEN_HOME  Maven 3.9+ 根目录
+  //   NACOS_HOME  Nacos 2.x 解压目录（其下应有 bin\startup.cmd）
+  //   MYSQL_HOME  MySQL 8 解压目录（其下应有 bin\mysqld.exe）
+  //   MYSQL_DATA  MySQL 数据目录
+  // VSCode 会展开 ${env:NAME}，缺失时对应任务启动失败并提示路径不存在。
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "0. 启动 Nacos",
+      "type": "shell",
+      "command": "${env:NACOS_HOME}\\bin\\startup.cmd",
+      "args": ["-m", "standalone"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "1. 启动 MySQL",
+      "type": "shell",
+      "command": "${env:MYSQL_HOME}\\bin\\mysqld.exe",
+      "args": [
+        "--basedir=${env:MYSQL_HOME}",
+        "--datadir=${env:MYSQL_DATA}",
+        "--console"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "2. 启动用户服务",
+      "type": "shell",
+      "command": "${env:MAVEN_HOME}\\bin\\mvn.cmd",
+      "args": [
+        "spring-boot:run",
+        "-pl",
+        "services/user-service"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "3. 启动订单服务",
+      "type": "shell",
+      "command": "${env:MAVEN_HOME}\\bin\\mvn.cmd",
+      "args": [
+        "spring-boot:run",
+        "-pl",
+        "services/order-service"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "4. 启动前端",
+      "type": "shell",
+      "command": "npm",
+      "args": [
+        "run",
+        "dev"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "restaurant"
+      }
+    },
+    {
+      "label": "启动全部",
+      "dependsOrder": "parallel",
+      "dependsOn": [
+        "2. 启动用户服务",
+        "3. 启动订单服务",
+        "4. 启动前端"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

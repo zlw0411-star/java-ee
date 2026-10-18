@@ -1,0 +1,6 @@
+{
+  // 不保存本机绝对路径；依赖环境变量 JAVA_HOME 与 MAVEN_HOME。
+  "java.jdt.ls.java.home": "${env:JAVA_HOME}",
+  "maven.executable.path": "${env:MAVEN_HOME}\\bin\\mvn.cmd",
+  "terminal.integrated.defaultProfile.windows": "PowerShell"
+}
