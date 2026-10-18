@@ -54,22 +54,40 @@
 
 ## 4. 当前状态与剩余风险
 
-**仓库已设为 private**，外部无法访问。这解决了「公开可见」的问题，但**没有**解决「GitHub 服务器上仍有旧对象」的问题。
+**仓库已设为 private**，外部无法访问。这解决了「公开可见」的问题，但**没有**解决「GitHub 服务器上仍有旧对象」的问题：只要仓库重新变为 public，旧 commit 仍可通过 SHA 下载。
 
-要彻底移除，需要在以下两种方式中选一种：
+要彻底移除，需在以下两种方式中选一种：
 
 1. **删除仓库后重建**（推荐，用于 0 star / 0 fork 的课程仓库）——立即、彻底，代价是链接失效
 2. **向 GitHub Support 提工单**，提供仓库名、受影响 PR 数、`git-filter-repo` 输出的 First Changed Commit——GitHub 才会做服务器端 GC 并清除缓存视图
 
 判断依据：该仓库 0 star、0 fork、0 PR，删除重建的外部影响接近于零。
 
+`gh` CLI 的当前令牌仅有 `repo` scope，删除仓库需要 `delete_repo`，需在本机完成一次设备授权：
+
+```powershell
+gh auth refresh -h github.com -s delete_repo
+gh repo delete zlw0411-star/java-ee --yes
+```
+
+删除后重新创建并推送（本地仓库已是干净的 9 次提交）：
+
+```powershell
+gh repo create zlw0411-star/java-ee --public --source=. --remote=origin --push
+```
+
 ## 5. 与代码无关但更紧急的一条
 
 如果学校教务 / 图书馆 / 校园网使用「学号 + 默认密码」，**应立即修改密码**。这一项的实际风险高于 GitHub 上的一切，且与本次清理无关。
 
-## 6. 待办
+## 6. 其他同类问题（已处理）
 
-- [ ] 决定删除重建还是提工单（见第 4 节）
-- [ ] 决定后把仓库重新设为 public，并确认新历史正常
-- [ ] `personal-website` 中两处「上海电力大学」表述需核对真实性（见 `lib/portfolio-data.ts`）
-- [ ] 其他仓库的 README 描述与实际内容不一致的问题（另行处理）
+| 仓库 | 问题 | 处理 |
+| --- | --- | --- |
+| `air-ticket-system` | `APP_JWT_SECRET` 有演示默认值；`start-backend.ps1` 写死 `E:\JDK17`、`E:\Maven` | 密钥无默认值，`JwtService` 拒绝空值与占位值；脚本改读 `JAVA_HOME`/`MAVEN_HOME` |
+| `campus-card-system` | `scripts/tools.ps1` 内固定 `E:\JDK17`、`E:\Maven`、`E:\MySQL`、`E:\nodejs` 候选路径 | 只依赖 `PATH` 与 `*_HOME` 环境变量，找不到时报错 |
+
+## 7. 待办
+
+- [ ] 决定删除重建还是提工单（见第 4 节）；完成后将仓库改回 public
+- [ ] `personal-website` 中两处「上海电力大学」表述需核对真实性（`lib/portfolio-data.ts` 第 38、220 行附近）——属事实性内容，未经确认不应擅自修改
