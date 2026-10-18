@@ -1,0 +1,32 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: restaurant-user-service
+  config:
+    import: optional:nacos:${spring.application.name}.yml
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:3306/restaurant?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: ${DB_USER:restaurant}
+    password: ${DB_PASSWORD:restaurant}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+      config:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+        file-extension: yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+app:
+  token:
+    # 不提供可用的默认密钥；未设置 APP_TOKEN_SECRET 时服务启动失败并给出提示。
+    secret: ${APP_TOKEN_SECRET:}
+    ttl-minutes: 720
